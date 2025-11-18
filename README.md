@@ -24,21 +24,31 @@ Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backen
 
 ## 2. Konfiguration (`.env`)
 
-1. **Empfohlen:** interaktiver Assistent
+1. **Empfohlen (lokal):**
    ```bash
-   make setup-env
+   make setup
+   # oder
+   make setup-dev
    ```
-   - Legt `.env` aus `env.template` an, zeigt pro Variable eine Kurzbeschreibung und lässt Standardwerte per Enter übernehmen (oder mit `.` leeren).
-2. **Alternativ (manuell):** `env.template` kopieren und als `.env` speichern.
-3. Die wichtigsten Variablen im Überblick:
+   - Fragt nur dev-relevante Variablen ab (z. B. Mailpit, PgAdmin) und nutzt dev-Defaults als Platzhalter.
+2. **Server/Produktion:**
+   ```bash
+   make setup-prod
+   ```
+   - Fokus auf TLS-/Domain-Variablen, `NODE_ENV=production`, `COMPOSE_PROFILES=prod` usw.
+3. **Alle Variablen manuell durchgehen:** `make setup-env`
+4. **Alternativ (komplett manuell):** `env.template` kopieren und als `.env` speichern.
+5. Die wichtigsten Variablen im Überblick:
    - **Allgemein**: `NODE_ENV`, `NEXT_PUBLIC_SITE_URL` (öffentliche URL des Frontends), `SITE_DOMAIN` (Domain ohne Schema, für TLS), `ADMIN_TOKEN`, `COMPOSE_PROFILES` (z. B. `dev` lokal oder `prod,n8n` auf dem Server), optional `AUTH_DISABLED=true` nur lokal.
    - **TLS**: `ACME_EMAIL` (Empfänger für Let's-Encrypt-Benachrichtigungen).
-   - **Git Remote**: `NEW_REMOTE_URL` (optional). Wenn gesetzt, führt `make setup-env` automatisch `make switch-remote` aus und zeigt anschließend das neue `origin`.
+   - **Git Remote**: `NEW_REMOTE_URL` (optional). Wenn gesetzt, führen `make setup*` & `make setup-env` automatisch `make switch-remote` aus und zeigen anschließend das neue `origin`.
    - **Datenbank**: `POSTGRES_USER`, `POSTGRES_DB`, `POSTGRES_PASSWORD`, `DATABASE_URL` (muss zu den obigen Werten passen).
    - **n8n** (nur wenn genutzt): `N8N_HOST`, `N8N_DOMAIN` (für TLS), `N8N_PROTOCOL`, optional `N8N_WEBHOOK_URL`, Basic-Auth (`N8N_BASIC_AUTH_*`) und SMTP-Konfiguration (`N8N_SMTP_*`).
    - **PgAdmin/Mailpit**: Zugangsdaten und SMTP-Port kannst du bei Bedarf anpassen.
-4. Production-Domains direkt eintragen (z. B. `https://ai-test.dakatos.online`).
-5. Für lokale Entwicklung kannst du `NEXT_PUBLIC_SITE_URL=http://localhost:3000` und `AUTH_DISABLED=true` setzen.
+6. Production-Domains direkt eintragen (z. B. `https://ai-test.dakatos.online`).
+7. Für lokale Entwicklung kannst du `NEXT_PUBLIC_SITE_URL=http://localhost:3000` und `AUTH_DISABLED=true` setzen.
+
+> Hinweis: In `env.template` befinden sich `# @meta {...}`-Kommentare. Darüber steuerst du Beschreibungstexte, Default-Werte pro Scope (`dev`, `prod`, `all`) und ob eine Variable nur in bestimmten Setups abgefragt wird. Passe sie an, wenn du weitere Variablen hinzufügst.
 
 Tipp: Du kannst mehrere `.env`-Dateien verwalten (z. B. `.env.dev`, `.env.prod`) und vor dem Start die passende Datei nach `.env` kopieren oder via `env_file:` in separaten Compose-Overrides referenzieren.
 
@@ -185,7 +195,7 @@ docker compose \
   ```
 - **Git-Remote wechseln**:
   - Manuell via `make switch-remote NEW_REMOTE_URL=git@github.com:user/repo.git`
-  - `make setup-env` ruft diesen Task automatisch auf, wenn `NEW_REMOTE_URL` in `.env` gesetzt ist (leer → wird übersprungen).
+  - Die Targets `make setup`, `make setup-dev`, `make setup-prod` und `make setup-env` rufen den Task automatisch auf, wenn `NEW_REMOTE_URL` in `.env` gesetzt ist (leer → wird übersprungen).
 
 ---
 

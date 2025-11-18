@@ -1,4 +1,4 @@
-.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate setup-env switch-remote
+.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate setup setup-dev setup-prod setup-env post-setup switch-remote
 
 COMPOSE ?= docker compose
 DEV_PROFILES := --profile dev
@@ -24,7 +24,10 @@ help:
 	@echo "  make rebuild-prod  - Baut web ohne Cache neu und startet das prod-Profil"
 	@echo "  make n8n-logs      - Folgt den Logs von n8n (falls gestartet)"
 	@echo "  make update-n8n    - Holt das neueste n8n-Image und startet den Container neu"
-	@echo "  make setup-env     - Interaktiver Assistent, der .env aus env.template erstellt"
+	@echo "  make setup         - Alias für setup-dev (lokales Setup)"
+	@echo "  make setup-dev     - Interaktiver Assistent mit dev-Defaults"
+	@echo "  make setup-prod    - Interaktiver Assistent mit prod-Defaults"
+	@echo "  make setup-env     - Setup ohne Scope (alle Variablen der Reihe nach)"
 	@echo "  make switch-remote - Setzt das Git-Remote (Standard-Name: origin)"
 	@echo "  make pull          - Führt git pull für den aktuellen Branch aus"
 	@echo "  make lint          - Führt npm run lint im web-dev Container aus"
@@ -102,8 +105,21 @@ studio:
 migrate:
 	$(COMPOSE) exec web-dev npx prisma migrate deploy --schema=prisma/schema.prisma
 
+setup: setup-dev
+
+setup-dev:
+	@SETUP_ENV_SCOPE=dev node scripts/setup-env.cjs
+	@$(MAKE) --no-print-directory post-setup
+
+setup-prod:
+	@SETUP_ENV_SCOPE=prod node scripts/setup-env.cjs
+	@$(MAKE) --no-print-directory post-setup
+
 setup-env:
 	@node scripts/setup-env.cjs
+	@$(MAKE) --no-print-directory post-setup
+
+post-setup:
 	@if [ -f .env ]; then \
 		NEW_REMOTE_URL=$$(grep -E '^NEW_REMOTE_URL=' .env | head -n1 | cut -d= -f2-); \
 		if [ -n "$$NEW_REMOTE_URL" ]; then \

@@ -3,7 +3,7 @@
 Dieser Leitfaden zeigt dir, wie du in diesem Projekt schrittweise einen Chat‑Agent (später Voice‑Agent) baust und n8n einbindest. Alles ist für Windows, macOS und Linux vorbereitet.
 
 ## Voraussetzungen
-- Repo geklont, `.env` ausgefüllt (via `make setup-env` aus `env.template`, siehe `README.md`)
+- Repo geklont, `.env` ausgefüllt (via `make setup-dev` oder `make setup-prod` aus `env.template`, siehe `README.md`)
 - Stack läuft: `docker compose up -d --build`
 - Erreichbar:
   - Web: `http://localhost:3000`

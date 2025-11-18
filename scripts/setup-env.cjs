@@ -5,40 +5,13 @@ const path = require("node:path");
 const readline = require("node:readline/promises");
 const { stdin, stdout } = require("node:process");
 
-const descriptions = {
-  NODE_ENV: "Node.js Umgebung (development oder production)",
-  NEXT_PUBLIC_SITE_URL: "Öffentliche URL deiner Webseite",
-  COMPOSE_PROFILES: "Docker Compose Profile (z. B. dev oder prod,n8n)",
-  SITE_DOMAIN: "Domain ohne Schema für Caddy/HTTPS",
-  ACME_EMAIL: "E-Mail für Let's-Encrypt-Benachrichtigungen",
-  N8N_DOMAIN: "Optionale Domain, falls n8n öffentlich erreichbar sein soll",
-  NEW_REMOTE_URL:
-    "Optional: neues Git-Remote (git@github.com:user/repo.git) für automatische Umschaltung",
-  POSTGRES_USER: "Postgres Benutzername",
-  POSTGRES_DB: "Postgres Datenbankname",
-  POSTGRES_PASSWORD: "Postgres Passwort (auch in DATABASE_URL nutzen)",
-  DATABASE_URL: "Direkter Prisma-Connection-String",
-  ADMIN_TOKEN: "X-Admin-Token für geschützte API-Routen",
-  AUTH_DISABLED: "Nur lokal true setzen, um Token-Checks zu deaktivieren",
-  N8N_BASIC_AUTH_USER: "n8n Basic-Auth Benutzer",
-  N8N_BASIC_AUTH_PASSWORD: "n8n Basic-Auth Passwort",
-  N8N_EMAIL_MODE: "E-Mail Modus für n8n (z. B. smtp)",
-  N8N_SMTP_HOST: "SMTP Host für n8n (lokal Mailpit)",
-  N8N_SMTP_PORT: "SMTP Port für n8n",
-  N8N_SMTP_SSL: "true, wenn SMTP über SSL läuft",
-  N8N_SMTP_USER: "SMTP Benutzername (falls benötigt)",
-  N8N_SMTP_PASS: "SMTP Passwort (falls benötigt)",
-  N8N_SMTP_SENDER: "Absenderadresse für n8n-E-Mails",
-  N8N_PROTOCOL: "Protokoll für n8n-Links (http oder https)",
-  N8N_HOST: "Host/Domain, den n8n in Links verwenden soll",
-  N8N_WEBHOOK_URL: "Externe URL, unter der Webhooks erreichbar sind",
-  PGADMIN_DEFAULT_EMAIL: "Login-E-Mail für pgAdmin",
-  PGADMIN_DEFAULT_PASSWORD: "Passwort für pgAdmin",
-  N8N_CHATBOT_WEBHOOK_URL: "Produktiver Webhook-Endpunkt für den Chatbot",
-};
-
 const templatePath = path.resolve(__dirname, "..", "env.template");
 const targetPath = path.resolve(__dirname, "..", ".env");
+const scopeFromEnv =
+  process.env.SETUP_ENV_SCOPE ||
+  (process.argv.find((arg) => arg.startsWith("--scope=")) || "")
+    .split("=")[1];
+const activeScope = scopeFromEnv ? scopeFromEnv.trim().toLowerCase() : "";
 
 async function main() {
   if (!fs.existsSync(templatePath)) {
@@ -50,7 +23,7 @@ async function main() {
     const confirmRl = readline.createInterface({ input: stdin, output: stdout });
     const answer = (
       await confirmRl.question(
-        ".env existiert bereits. Überschreiben? (y/N) "
+        ".env existiert bereits. Überschreiben? (y/N) ",
       )
     )
       .trim()
@@ -64,15 +37,36 @@ async function main() {
   }
 
   console.log("🔧 Erstelle .env auf Basis von env.template");
-  console.log("   Enter oder 'skip' übernimmt den Standardwert, '.' setzt den Wert leer.\n");
+  if (activeScope) {
+    console.log(`   Setup-Modus: ${activeScope}`);
+  }
+  console.log(
+    "   Enter oder 'skip' übernimmt den Standardwert, '.' setzt den Wert leer.\n",
+  );
 
-  const templateLines = fs.readFileSync(templatePath, "utf8").split(/\r?\n/);
+  const templateLines = fs
+    .readFileSync(templatePath, "utf8")
+    .split(/\r?\n/);
   const rl = readline.createInterface({ input: stdin, output: stdout });
   const resultLines = [];
+  let pendingMeta = null;
 
   try {
     for (const line of templateLines) {
-      if (line.trim().length === 0 || line.trim().startsWith("#")) {
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith("# @meta")) {
+        const json = trimmed.slice(7).trim();
+        try {
+          pendingMeta = JSON.parse(json);
+        } catch (err) {
+          console.warn(`⚠️  Konnte Meta-Daten nicht parsen (${json}):`, err);
+          pendingMeta = null;
+        }
+        continue;
+      }
+
+      if (trimmed.length === 0 || trimmed.startsWith("#")) {
         resultLines.push(line);
         continue;
       }
@@ -85,16 +79,42 @@ async function main() {
 
       const key = line.slice(0, separatorIndex).trim();
       const defaultValue = line.slice(separatorIndex + 1);
+      const meta = pendingMeta;
+      pendingMeta = null;
+
+      const scopeList = Array.isArray(meta?.scopes)
+        ? meta.scopes.map((s) => String(s).toLowerCase())
+        : null;
+      const scopeIncluded =
+        !activeScope ||
+        !scopeList ||
+        scopeList.length === 0 ||
+        scopeList.includes(activeScope);
+
+      if (!scopeIncluded) {
+        resultLines.push(line);
+        continue;
+      }
+
       const description =
-        descriptions[key] ?? "Keine Beschreibung hinterlegt (Enter = Standard).";
-      const defaultDisplay = defaultValue === "" ? "<leer>" : defaultValue;
+        meta?.description ??
+        "Keine Beschreibung hinterlegt (Enter = Standard).";
+      const scopedDefault = pickScopedValue(meta?.defaults, defaultValue);
+      const placeholder =
+        pickScopedValue(meta?.placeholders || meta?.placeholder, scopedDefault) ??
+        "";
+      const defaultDisplay =
+        placeholder && placeholder.length > 0
+          ? placeholder
+          : scopedDefault || "<leer>";
+
       const answer = (
         await rl.question(
-          `\n${key}\n  ${description}\n  Standard: ${defaultDisplay}\n> `
+          `\n${key}\n  ${description}\n  Standard: ${defaultDisplay}\n> `,
         )
       ).trim();
 
-      let finalValue = defaultValue;
+      let finalValue = scopedDefault ?? defaultValue;
       if (answer === ".") {
         finalValue = "";
       } else if (answer.length > 0 && answer.toLowerCase() !== "skip") {
@@ -111,8 +131,28 @@ async function main() {
   console.log(`\n✅ .env gespeichert unter ${targetPath}`);
 }
 
+function pickScopedValue(source, fallback) {
+  if (!source) {
+    return fallback;
+  }
+
+  if (typeof source === "string") {
+    return source;
+  }
+
+  if (typeof source === "object") {
+    if (activeScope && source[activeScope] !== undefined) {
+      return source[activeScope];
+    }
+    if (source.all !== undefined) {
+      return source.all;
+    }
+  }
+
+  return fallback;
+}
+
 main().catch((error) => {
   console.error("❌ Setup fehlgeschlagen:", error);
   process.exit(1);
 });
-

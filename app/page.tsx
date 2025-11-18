@@ -250,7 +250,7 @@ export default function Home() {
               </h2>
             </div>
             <pre className="rounded-2xl bg-black p-5 text-sm text-white">
-{`make setup-env
+{`make setup
 make dev-n8n
 open http://localhost:3000`}
             </pre>
