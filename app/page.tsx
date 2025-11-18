@@ -151,6 +151,12 @@ const resourceLinks = [
     description: "Dateien im Repo erklären Variablen, Tokens & Profile.",
   },
   {
+    label: "Guide",
+    title: "Domain-Setup & DNS",
+    description: "Namecheap-Kauf & DNS-Konfiguration Schritt für Schritt.",
+    href: "/guides/domain",
+  },
+  {
     label: "Flows",
     title: "n8n Webhook (lokal)",
     description: "http://localhost:5678/webhook/chat",
@@ -194,6 +200,12 @@ export default function Home() {
               className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
             >
               Template installieren
+            </Link>
+            <Link
+              href="/guides/domain"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-5 py-2 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800/60"
+            >
+              Domain-Setup Guide
             </Link>
             <a
               href="https://ki-experten-beratung.de"

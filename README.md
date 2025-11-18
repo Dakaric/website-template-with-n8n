@@ -11,6 +11,7 @@ Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backen
 - **Security out of the box**: Alle Admin-Routen setzen `X-Admin-Token` voraus (`lib/auth.ts`). Docker-Profile trennen dev/prod/n8n, TLS kommt via Caddy.
 - **Dev-Komfort**: Mailpit, PgAdmin, Prisma Studio und Makefile-Shortcuts beschleunigen lokale Iterationen.
 - **Coaching & Services**: Bei Bedarf Unterstützung durch Christian Langer (`ki-experten-beratung.de`) – siehe Abschnitt „Unterstützung & Coaching“.
+- **Domain-Setup Guide**: Unter `/guides/domain` findest du eine Anleitung für Namecheap-Kauf & DNS-Konfiguration (inkl. n8n-Subdomain).
 
 ---
 
@@ -35,6 +36,7 @@ Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backen
    ```bash
    make setup-prod
    ```
+   - Führt vor den Fragen `scripts/check-server-tools.sh` aus (installiert/aktiviert Docker, Docker Compose Plugin, git & curl, falls nötig).
    - Fokus auf TLS-/Domain-Variablen, `NODE_ENV=production`, `COMPOSE_PROFILES=prod` usw.
 3. **Alle Variablen manuell durchgehen:** `make setup-env`
 4. **Alternativ (komplett manuell):** `env.template` kopieren und als `.env` speichern.

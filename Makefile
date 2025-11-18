@@ -112,6 +112,7 @@ setup-dev:
 	@$(MAKE) --no-print-directory post-setup
 
 setup-prod:
+	@bash scripts/check-server-tools.sh
 	@SETUP_ENV_SCOPE=prod node scripts/setup-env.cjs
 	@$(MAKE) --no-print-directory post-setup
 
