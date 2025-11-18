@@ -7,11 +7,26 @@ const { stdin, stdout } = require("node:process");
 
 const templatePath = path.resolve(__dirname, "..", "env.template");
 const targetPath = path.resolve(__dirname, "..", ".env");
-const scopeFromEnv =
-  process.env.SETUP_ENV_SCOPE ||
-  (process.argv.find((arg) => arg.startsWith("--scope=")) || "")
-    .split("=")[1];
+
+function findArgValue(flag) {
+  const prefix = `--${flag}=`;
+  const hit = process.argv.find((arg) => arg.startsWith(prefix));
+  return hit ? hit.slice(prefix.length) : "";
+}
+
+const scopeFromEnv = process.env.SETUP_ENV_SCOPE || findArgValue("scope");
+const featuresFromEnv =
+  process.env.SETUP_FEATURES || findArgValue("features");
 const activeScope = scopeFromEnv ? scopeFromEnv.trim().toLowerCase() : "";
+
+function parseFeatureList(input) {
+  return input
+    ? input
+        .split(",")
+        .map((entry) => entry.trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+}
 
 async function main() {
   if (!fs.existsSync(templatePath)) {
@@ -44,12 +59,22 @@ async function main() {
     "   Enter oder 'skip' übernimmt den Standardwert, '.' setzt den Wert leer.\n",
   );
 
-  const templateLines = fs
-    .readFileSync(templatePath, "utf8")
-    .split(/\r?\n/);
+  const templateLines = fs.readFileSync(templatePath, "utf8").split(/\r?\n/);
   const rl = readline.createInterface({ input: stdin, output: stdout });
   const resultLines = [];
   let pendingMeta = null;
+  const activeFeatures = new Set(parseFeatureList(featuresFromEnv));
+
+  if (!featuresFromEnv) {
+    const includeN8n = await askYesNo(
+      rl,
+      "n8n Integration konfigurieren? (Y/n)",
+      true,
+    );
+    if (includeN8n) {
+      activeFeatures.add("n8n");
+    }
+  }
 
   try {
     for (const line of templateLines) {
@@ -91,7 +116,15 @@ async function main() {
         scopeList.length === 0 ||
         scopeList.includes(activeScope);
 
-      if (!scopeIncluded) {
+      const featureList = Array.isArray(meta?.features)
+        ? meta.features.map((f) => String(f).toLowerCase())
+        : null;
+      const featureIncluded =
+        !featureList ||
+        featureList.length === 0 ||
+        featureList.some((feature) => activeFeatures.has(feature));
+
+      if (!scopeIncluded || !featureIncluded) {
         resultLines.push(line);
         continue;
       }
@@ -150,6 +183,25 @@ function pickScopedValue(source, fallback) {
   }
 
   return fallback;
+}
+
+async function askYesNo(rl, question, defaultYes = true) {
+  const hint = defaultYes ? "(Y/n)" : "(y/N)";
+  const answer = (
+    await rl.question(`${question} ${hint} `)
+  ).trim().toLowerCase();
+
+  if (!answer) {
+    return defaultYes;
+  }
+
+  if (["y", "yes", "j", "ja"].includes(answer)) {
+    return true;
+  }
+  if (["n", "no", "nein"].includes(answer)) {
+    return false;
+  }
+  return defaultYes;
 }
 
 main().catch((error) => {

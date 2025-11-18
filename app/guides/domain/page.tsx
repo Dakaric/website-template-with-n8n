@@ -185,8 +185,13 @@ export default function DomainGuidePage() {
           <li>1. `make setup-prod` ausführen → Script prüft/ installiert Docker & Compose.</li>
           <li>2. `.env` mit Produktionswerten speichern (`SITE_DOMAIN`, `N8N_DOMAIN`).</li>
           <li>3. `make prod-n8n` starten, Caddy kümmert sich um HTTPS.</li>
-          <li>4. Health-Checks testen: `curl -k https://<domain>/api/health`.</li>
-          <li>5. n8n Basic Auth verifizieren: `curl -I -u user:pass https://n8n.<domain>`.</li>
+          <li>
+            4. Health-Checks testen: <code>curl -k https://&lt;domain&gt;/api/health</code>
+          </li>
+          <li>
+            5. n8n Basic Auth verifizieren:{" "}
+            <code>curl -I -u user:pass https://n8n.&lt;domain&gt;</code>
+          </li>
         </ol>
         <p className="text-sm text-white/80">
           Sobald DNS propagiert ist (5–15 Minuten), wird Caddy automatisch valide

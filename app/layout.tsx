@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Automations Kurs",
-  description: "Grundgerüst für den Kurs",
+  title: "Website Starter Template",
+  description: "Neutrales Next.js + n8n Grundgerüst für Webprojekte",
 };
 
 export default function RootLayout({

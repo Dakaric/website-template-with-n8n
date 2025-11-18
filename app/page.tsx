@@ -73,17 +73,17 @@ const features = [
 const rolloutSteps = [
   {
     label: "1",
-    title: ".env vorbereiten",
+    title: "Setup-Assistent ausführen",
     description:
-      "Aus `env.template` kopieren und Admin-, Datenbank- sowie n8n-Zugänge hinterlegen.",
-    hint: "Ohne `X-Admin-Token` sind die Admin-Routen gesperrt.",
+      "`make setup` (lokal) oder `make setup-prod` (Server) stellt Fragen, befüllt `.env` und kümmert sich um Remote-URL sowie Server-Voraussetzungen.",
+    hint: "Enter übernimmt Defaults, `.` setzt gezielt leere Werte.",
   },
   {
     label: "2",
     title: "Stack starten",
     description:
-      "Docker-Compose Profile für Web, DB, n8n, Mailpit & PgAdmin sind enthalten.",
-    hint: "`make dev-n8n` oder `docker compose --profile dev --profile n8n up -d`.",
+      "Je nach Profil `make dev-n8n` (lokal) oder `make prod-n8n` (Server). Docker 👷 + Compose kümmern sich um alle Services.",
+    hint: "Logs via `docker compose logs -f web(-dev)` checken.",
   },
   {
     label: "3",
@@ -155,6 +155,12 @@ const resourceLinks = [
     title: "Domain-Setup & DNS",
     description: "Namecheap-Kauf & DNS-Konfiguration Schritt für Schritt.",
     href: "/guides/domain",
+  },
+  {
+    label: "Guide",
+    title: "Postgres & Daten",
+    description: "CLI, Prisma Studio und Backups im Überblick.",
+    href: "/guides/postgres",
   },
   {
     label: "Flows",
