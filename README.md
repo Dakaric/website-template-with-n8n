@@ -1,6 +1,16 @@
 ## Projekt-Template – Next.js + Prisma + n8n
 
-Dieses Repository ist ein Ausgangspunkt für Projekte mit Next.js (App Router), Postgres/Prisma, wahlweise n8n sowie Hilfsdiensten wie Mailpit und pgAdmin. Alle Komponenten werden über Docker Compose gesteuert und lassen sich sowohl lokal (Development) als auch auf einem Server (Production) betreiben.
+Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backend-Stack, wenn du AI-Automationen (z. B. Chat- oder Voice-Agents) mit n8n orchestrieren willst. Alles ist generisch gehalten: Branding austauschen, Texte anpassen – Infrastruktur, Security und Integrationen bleiben stehen. Ideal für schnelle POCs, Kunden-Demos oder produktive Rollouts.
+
+---
+
+## Highlights & Inhalte
+
+- **Startseite als Template**: `app/page.tsx` ist eine modulare Landingpage (Hero, Feature-Kacheln, Integrationsliste, Deploy-Checkliste, Coaching-CTA). Inhalte stammen aus typisierten Arrays – ändere nur Texte/Links.
+- **n8n Deep Integration**: `/api/chat` proxyt an `N8N_WEBHOOK_URL`, `/api/webhooks/n8n` zeigt, wie sichere Rückkanäle per Token funktionieren. Beispiel-Workflow liegt unter `n8n_workflows/chatbot.json`.
+- **Security out of the box**: Alle Admin-Routen setzen `X-Admin-Token` voraus (`lib/auth.ts`). Docker-Profile trennen dev/prod/n8n, TLS kommt via Caddy.
+- **Dev-Komfort**: Mailpit, PgAdmin, Prisma Studio und Makefile-Shortcuts beschleunigen lokale Iterationen.
+- **Coaching & Services**: Bei Bedarf Unterstützung durch Christian Langer (`ki-experten-beratung.de`) – siehe Abschnitt „Unterstützung & Coaching“.
 
 ---
 
@@ -36,7 +46,7 @@ Tipp: Du kannst mehrere `.env`-Dateien verwalten (z. B. `.env.dev`, `.env.prod
 | `prod` | `db`, `web`, `caddy`                         | Produktionsbetrieb mit automatischem HTTPS (Caddy) |
 | `n8n`  | `n8n`                                        | Optionaler Start von n8n (kann mit jedem Profil kombiniert werden) |
 
-Standardmäßig laufen alle Dienste nur auf dem internen Docker-Netzwerk bzw. auf `127.0.0.1`. Für HTTP(S)-Zugriff in Produktion empfiehlt sich ein Reverse Proxy (z. B. nginx; siehe unten).
+Standardmäßig laufen alle Dienste nur auf dem internen Docker-Netzwerk bzw. auf `127.0.0.1`. Für HTTP(S)-Zugriff in Produktion ist bereits ein Caddy-Reverse-Proxy vorbereitet.
 
 ### Dienste & Ports
 
@@ -161,16 +171,43 @@ docker compose \
   ```
 - **Mailpit öffnen**: `http://localhost:8025`
 - **PgAdmin öffnen**: `http://localhost:5050` (Login mit `PGADMIN_DEFAULT_*`)
+- **Chat-Proxy testen**:
+  ```bash
+  curl -sS -H "Content-Type: application/json" \
+    -d '{"message":"Hallo Template"}' \
+    http://localhost:3000/api/chat
+  ```
 
 ---
 
-## 8. Sicherheit & Best Practices
+## 8. Frontend anpassen
+
+- **Hero/Copy**: Passe Inhalte in `app/page.tsx` an. Dank der Daten-Arrays (`features`, `rolloutSteps`, `integrationPoints` …) genügt das Editieren der jeweiligen Texte/Links.
+- **Branding**: Fonts kommen aus Geist, globale Styles aus `app/globals.css`. Du kannst dort Farbvariablen oder Tailwind-Themes erweitern.
+- **Chatbot**: Die Floating-Chat-Komponente (`components/Chatbot.tsx`) kann optional entfernt oder erweitert werden. Standardmäßig ruft sie `/api/chat` auf.
+- **Blog-Demo**: Unter `app/blog/page.tsx` findest du eine einfache Seite, die auf das Prisma-Modell `BlogPost` verweist – ideal für erste CMS-/Automation-Experimente.
+
+---
+
+## 9. Sicherheit & Best Practices
 
 - `.env` niemals committen oder weitergeben.
 - Starke Passwörter/Tokens wählen und regelmäßig rotieren.
 - In Produktion `AUTH_DISABLED=false` lassen.
 - Firewalls so konfigurieren, dass nur nötige Ports offen sind (z. B. 80/443 für Web, 22 für SSH).
 - Backups für Postgres einplanen (`docker compose exec db pg_dump ...`).
+
+---
+
+## 10. Unterstützung & Coaching
+
+Du brauchst Hilfe bei Strategie, Umsetzung oder Training rund um AI-Automations?
+
+- **Christian Langer** – AI-Automation-Manager  
+  E-Mail: `cl@ki-experten-beratung.de`  
+  Webseite: [ki-experten-beratung.de](https://ki-experten-beratung.de)
+
+Leistungen: individuelle Beratung, n8n-Architektur, Done-for-you-Automationen, Team-Enablement sowie ein AI-Automation-Kurs, in dem dieses Template als Ausgangsbasis dient.
 
 ---
 
