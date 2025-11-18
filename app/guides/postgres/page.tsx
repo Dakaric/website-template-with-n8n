@@ -13,7 +13,7 @@ const accessOptions = [
       "Grafische Oberfläche zum Lesen/Schreiben deiner Tabellen. Läuft im Web-Container.",
     command: "docker compose exec web-dev npx prisma studio",
     notes: [
-      "Öffnet https://localhost:5555 im Browser",
+      "Nach dem Befehl öffnet sich automatisch https://localhost:5555 (bei Bedarf manuell im Browser öffnen)",
       "Authentifizierung nicht nötig; greift direkt auf `DATABASE_URL` zu",
       "Perfekt zum schnellen Testen neuer Modelle oder Inhalte",
     ],
@@ -25,7 +25,9 @@ const accessOptions = [
     command: "http://localhost:5050",
     notes: [
       "Login mit `PGADMIN_DEFAULT_EMAIL` & `PGADMIN_DEFAULT_PASSWORD`",
-      "Neue Verbindung: Host `db`, Port `5432`, User/Pass aus `.env`",
+      "Nach dem Login: Rechtsklick auf \"Servers\" → Register → Server",
+      "Tab Allgemein: sprechenden Namen vergeben (z. B. Website Starter)",
+      "Tab Verbindung: Host `db`, Port `5432`, Maintenance DB = `POSTGRES_DB`, Benutzer + Passwort aus `.env` eintragen",
       "Kann für Prod deaktiviert bleiben – nur dev-Profil enthält den Dienst",
     ],
   },
@@ -128,7 +130,7 @@ export default function PostgresGuidePage() {
           {accessOptions.map((option) => (
             <article
               key={option.title}
-              className="rounded-2xl border border-zinc-200 bg-white/70 p-6 dark:border-zinc-800 dark:bg-zinc-900/40"
+              className="rounded-2xl border border-zinc-200 bg-white/70 p-6 break-words dark:border-zinc-800 dark:bg-zinc-900/40"
             >
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                 {option.title}
@@ -136,7 +138,7 @@ export default function PostgresGuidePage() {
               <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
                 {option.description}
               </p>
-              <pre className="mt-4 rounded-2xl bg-black/90 p-4 text-xs text-white">
+              <pre className="mt-4 overflow-x-auto rounded-2xl bg-black/90 p-4 text-xs text-white">
                 {option.command}
               </pre>
               <ul className="mt-4 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">

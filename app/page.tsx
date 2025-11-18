@@ -213,6 +213,12 @@ export default function Home() {
             >
               Domain-Setup Guide
             </Link>
+            <Link
+              href="/guides/postgres"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-5 py-2 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800/60"
+            >
+              Postgres Guide
+            </Link>
             <a
               href="https://ki-experten-beratung.de"
               target="_blank"
