@@ -24,15 +24,20 @@ Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backen
 
 ## 2. Konfiguration (`.env`)
 
-1. `env.example` kopieren und als `.env` speichern.
-2. Die wichtigsten Variablen im Überblick:
+1. **Empfohlen:** interaktiver Assistent
+   ```bash
+   make setup-env
+   ```
+   - Legt `.env` aus `env.template` an, zeigt pro Variable eine Kurzbeschreibung und lässt Standardwerte per Enter übernehmen (oder mit `.` leeren).
+2. **Alternativ (manuell):** `env.template` kopieren und als `.env` speichern.
+3. Die wichtigsten Variablen im Überblick:
    - **Allgemein**: `NODE_ENV`, `NEXT_PUBLIC_SITE_URL` (öffentliche URL des Frontends), `SITE_DOMAIN` (Domain ohne Schema, für TLS), `ADMIN_TOKEN`, `COMPOSE_PROFILES` (z. B. `dev` lokal oder `prod,n8n` auf dem Server), optional `AUTH_DISABLED=true` nur lokal.
    - **TLS**: `ACME_EMAIL` (Empfänger für Let's-Encrypt-Benachrichtigungen).
    - **Datenbank**: `POSTGRES_USER`, `POSTGRES_DB`, `POSTGRES_PASSWORD`, `DATABASE_URL` (muss zu den obigen Werten passen).
    - **n8n** (nur wenn genutzt): `N8N_HOST`, `N8N_DOMAIN` (für TLS), `N8N_PROTOCOL`, optional `N8N_WEBHOOK_URL`, Basic-Auth (`N8N_BASIC_AUTH_*`) und SMTP-Konfiguration (`N8N_SMTP_*`).
    - **PgAdmin/Mailpit**: Zugangsdaten und SMTP-Port kannst du bei Bedarf anpassen.
-3. Production-Domains direkt eintragen (z. B. `https://ai-test.dakatos.online`).
-4. Für lokale Entwicklung kannst du `NEXT_PUBLIC_SITE_URL=http://localhost:3000` und `AUTH_DISABLED=true` setzen.
+4. Production-Domains direkt eintragen (z. B. `https://ai-test.dakatos.online`).
+5. Für lokale Entwicklung kannst du `NEXT_PUBLIC_SITE_URL=http://localhost:3000` und `AUTH_DISABLED=true` setzen.
 
 Tipp: Du kannst mehrere `.env`-Dateien verwalten (z. B. `.env.dev`, `.env.prod`) und vor dem Start die passende Datei nach `.env` kopieren oder via `env_file:` in separaten Compose-Overrides referenzieren.
 

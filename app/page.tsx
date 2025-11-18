@@ -75,7 +75,7 @@ const rolloutSteps = [
     label: "1",
     title: ".env vorbereiten",
     description:
-      "Aus `env.example` kopieren und Admin-, Datenbank- sowie n8n-Zugänge hinterlegen.",
+      "Aus `env.template` kopieren und Admin-, Datenbank- sowie n8n-Zugänge hinterlegen.",
     hint: "Ohne `X-Admin-Token` sind die Admin-Routen gesperrt.",
   },
   {
@@ -147,7 +147,7 @@ const deploymentPresets = [
 const resourceLinks = [
   {
     label: "Docs",
-    title: "README & env.example",
+    title: "README & env.template",
     description: "Dateien im Repo erklären Variablen, Tokens & Profile.",
   },
   {
@@ -250,7 +250,7 @@ export default function Home() {
               </h2>
             </div>
             <pre className="rounded-2xl bg-black p-5 text-sm text-white">
-{`cp env.example .env
+{`make setup-env
 make dev-n8n
 open http://localhost:3000`}
             </pre>

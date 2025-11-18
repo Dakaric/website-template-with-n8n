@@ -1,4 +1,4 @@
-.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate
+.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate setup-env
 
 COMPOSE ?= docker compose
 DEV_PROFILES := --profile dev
@@ -23,6 +23,7 @@ help:
 	@echo "  make rebuild-prod  - Baut web ohne Cache neu und startet das prod-Profil"
 	@echo "  make n8n-logs      - Folgt den Logs von n8n (falls gestartet)"
 	@echo "  make update-n8n    - Holt das neueste n8n-Image und startet den Container neu"
+	@echo "  make setup-env     - Interaktiver Assistent, der .env aus env.template erstellt"
 	@echo "  make pull          - Führt git pull für den aktuellen Branch aus"
 	@echo "  make lint          - Führt npm run lint im web-dev Container aus"
 	@echo "  make type          - Führt npm run type-check im web-dev Container aus"
@@ -98,4 +99,7 @@ studio:
 
 migrate:
 	$(COMPOSE) exec web-dev npx prisma migrate deploy --schema=prisma/schema.prisma
+
+setup-env:
+	@node scripts/setup-env.cjs
 
