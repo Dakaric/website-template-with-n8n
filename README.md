@@ -33,6 +33,7 @@ Dieses Repository liefert dir eine sofort einsatzbereite Landingpage samt Backen
 3. Die wichtigsten Variablen im Überblick:
    - **Allgemein**: `NODE_ENV`, `NEXT_PUBLIC_SITE_URL` (öffentliche URL des Frontends), `SITE_DOMAIN` (Domain ohne Schema, für TLS), `ADMIN_TOKEN`, `COMPOSE_PROFILES` (z. B. `dev` lokal oder `prod,n8n` auf dem Server), optional `AUTH_DISABLED=true` nur lokal.
    - **TLS**: `ACME_EMAIL` (Empfänger für Let's-Encrypt-Benachrichtigungen).
+   - **Git Remote**: `NEW_REMOTE_URL` (optional). Wenn gesetzt, führt `make setup-env` automatisch `make switch-remote` aus und zeigt anschließend das neue `origin`.
    - **Datenbank**: `POSTGRES_USER`, `POSTGRES_DB`, `POSTGRES_PASSWORD`, `DATABASE_URL` (muss zu den obigen Werten passen).
    - **n8n** (nur wenn genutzt): `N8N_HOST`, `N8N_DOMAIN` (für TLS), `N8N_PROTOCOL`, optional `N8N_WEBHOOK_URL`, Basic-Auth (`N8N_BASIC_AUTH_*`) und SMTP-Konfiguration (`N8N_SMTP_*`).
    - **PgAdmin/Mailpit**: Zugangsdaten und SMTP-Port kannst du bei Bedarf anpassen.
@@ -182,6 +183,9 @@ docker compose \
     -d '{"message":"Hallo Template"}' \
     http://localhost:3000/api/chat
   ```
+- **Git-Remote wechseln**:
+  - Manuell via `make switch-remote NEW_REMOTE_URL=git@github.com:user/repo.git`
+  - `make setup-env` ruft diesen Task automatisch auf, wenn `NEW_REMOTE_URL` in `.env` gesetzt ist (leer → wird übersprungen).
 
 ---
 

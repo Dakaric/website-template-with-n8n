@@ -1,9 +1,10 @@
-.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate setup-env
+.PHONY: help pull dev dev-n8n dev-down dev-restart dev-logs env-dev rebuild-dev prod prod-n8n prod-down prod-restart prod-logs env-prod rebuild-prod n8n-logs update-n8n lint type format studio migrate setup-env switch-remote
 
 COMPOSE ?= docker compose
 DEV_PROFILES := --profile dev
 PROD_PROFILES := --profile prod
 N8N_PROFILE := --profile n8n
+REMOTE_NAME ?= origin
 
 help:
 	@echo "Verfügbare Targets:"
@@ -24,6 +25,7 @@ help:
 	@echo "  make n8n-logs      - Folgt den Logs von n8n (falls gestartet)"
 	@echo "  make update-n8n    - Holt das neueste n8n-Image und startet den Container neu"
 	@echo "  make setup-env     - Interaktiver Assistent, der .env aus env.template erstellt"
+	@echo "  make switch-remote - Setzt das Git-Remote (Standard-Name: origin)"
 	@echo "  make pull          - Führt git pull für den aktuellen Branch aus"
 	@echo "  make lint          - Führt npm run lint im web-dev Container aus"
 	@echo "  make type          - Führt npm run type-check im web-dev Container aus"
@@ -102,4 +104,25 @@ migrate:
 
 setup-env:
 	@node scripts/setup-env.cjs
+	@if [ -f .env ]; then \
+		NEW_REMOTE_URL=$$(grep -E '^NEW_REMOTE_URL=' .env | head -n1 | cut -d= -f2-); \
+		if [ -n "$$NEW_REMOTE_URL" ]; then \
+			echo "➡️  NEW_REMOTE_URL erkannt: $$NEW_REMOTE_URL"; \
+			$(MAKE) switch-remote NEW_REMOTE_URL="$$NEW_REMOTE_URL"; \
+		else \
+			echo "ℹ️  Keine NEW_REMOTE_URL gesetzt – überspringe switch-remote."; \
+		fi \
+	else \
+		echo "⚠️  .env nicht gefunden – überspringe switch-remote."; \
+	fi
+
+switch-remote:
+	@[ -n "$(strip $(NEW_REMOTE_URL))" ] || (echo "Bitte NEW_REMOTE_URL angeben, z. B. make switch-remote NEW_REMOTE_URL=git@github.com:user/repo.git"; exit 1)
+	@if git remote | grep -qx "$(REMOTE_NAME)"; then \
+		echo "Entferne bestehendes Remote '$(REMOTE_NAME)'"; \
+		git remote remove $(REMOTE_NAME); \
+	fi
+	@git remote add $(REMOTE_NAME) $(NEW_REMOTE_URL)
+	@echo "Remote '$(REMOTE_NAME)' zeigt jetzt auf $(NEW_REMOTE_URL)"
+	@git remote -v
 

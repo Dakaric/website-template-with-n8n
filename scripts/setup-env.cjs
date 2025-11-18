@@ -12,6 +12,8 @@ const descriptions = {
   SITE_DOMAIN: "Domain ohne Schema für Caddy/HTTPS",
   ACME_EMAIL: "E-Mail für Let's-Encrypt-Benachrichtigungen",
   N8N_DOMAIN: "Optionale Domain, falls n8n öffentlich erreichbar sein soll",
+  NEW_REMOTE_URL:
+    "Optional: neues Git-Remote (git@github.com:user/repo.git) für automatische Umschaltung",
   POSTGRES_USER: "Postgres Benutzername",
   POSTGRES_DB: "Postgres Datenbankname",
   POSTGRES_PASSWORD: "Postgres Passwort (auch in DATABASE_URL nutzen)",
