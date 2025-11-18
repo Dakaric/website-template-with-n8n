@@ -13,7 +13,8 @@ const accessOptions = [
       "Grafische Oberfläche zum Lesen/Schreiben deiner Tabellen. Läuft im Web-Container.",
     command: "docker compose exec web-dev npx prisma studio",
     notes: [
-      "Nach dem Befehl öffnet sich automatisch https://localhost:5555 (bei Bedarf manuell im Browser öffnen)",
+      "Shortcut: `make studio` führt denselben Befehl im dev-Profil aus",
+      "Nach dem Start öffnet sich automatisch https://localhost:5555 (bei Bedarf manuell im Browser aufrufen)",
       "Authentifizierung nicht nötig; greift direkt auf `DATABASE_URL` zu",
       "Perfekt zum schnellen Testen neuer Modelle oder Inhalte",
     ],
@@ -28,7 +29,7 @@ const accessOptions = [
       "Nach dem Login: Rechtsklick auf \"Servers\" → Register → Server",
       "Tab Allgemein: sprechenden Namen vergeben (z. B. Website Starter)",
       "Tab Verbindung: Host `db`, Port `5432`, Maintenance DB = `POSTGRES_DB`, Benutzer + Passwort aus `.env` eintragen",
-      "Kann für Prod deaktiviert bleiben – nur dev-Profil enthält den Dienst",
+      "Kann (und sollte) in Produktion deaktiviert bleiben – dort arbeitest du über Prisma, direkte `psql`-Sessions oder eigene Bastion Hosts",
     ],
   },
   {
